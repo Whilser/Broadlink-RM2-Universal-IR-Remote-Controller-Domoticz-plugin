@@ -6,7 +6,7 @@
 #
 
 """
-<plugin key="BroadlinkRM" name="Broadlink Universal IR Remote Controller (RM2)" author="Whilser" version="0.1.0" wikilink=" " externallink="https://github.com/Whilser/Broadlink-RM2-Universal-IR-Remote-Controller-Domoticz-plugin">
+<plugin key="BroadlinkRM" name="Broadlink Universal IR Remote Controller (RM2)" author="Whilser" version="0.1.0" wikilink="https://www.domoticz.com/wiki/BroadlinkIR" externallink="https://github.com/Whilser/Broadlink-RM2-Universal-IR-Remote-Controller-Domoticz-plugin">
     <description>
         <h2>Broadlink Universal IR Remote Controller</h2><br/>
         <h3>Configuration</h3>
@@ -193,6 +193,10 @@ class BasePlugin:
 
         # Save command
         if Level == 40:
+            if len(self.lastLearnedIRCode) == 0:
+                Domoticz.Error('No IR command received, nothing to save!')
+                return
+
             devicesCount = self.devicesCount + self.commandUnit + self.temperatureUnit
             self.levelsCount += 10
             if self.levelsCount == 10: self.data['Unit '+str(devicesCount)] = []
@@ -210,6 +214,10 @@ class BasePlugin:
 
         # Create device
         if Level == 50:
+            if self.levelsCount == 0:
+                Domoticz.Error('No IR Levels saved, nothing to create!')
+                return
+
             self.devicesCount += 1
 
             self.dumpConfig()
@@ -236,7 +244,7 @@ class BasePlugin:
             try:
                 temperature = ir.check_temperature()
                 if ((temperature > 0) and (temperature < 100) and (self.commandUnit+self.temperatureUnit in Devices)): Devices[2].Update(nValue=0, sValue=str(temperature))
-                Domoticz.Debug('The temperature is now {} degrees.'.format(temperature))
+                Domoticz.Debug('The temperature now is {} degrees.'.format(temperature))
             except:
                 Domoticz.Error('Broadlink device not responding. Check the connection.')
                 self.connected = False
@@ -325,7 +333,7 @@ class BasePlugin:
                 ir.send_data(bytes.fromhex(ir_packet))
                 #time.sleep(0.100)
         except:
-            Domoticz.Error('Broadlink device not responding. Check the connection.')
+            Domoticz.Error('Broadlink device not responding. Check connection.')
             self.connected = False
 
     def discover(self):
