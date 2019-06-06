@@ -360,7 +360,7 @@ class BasePlugin:
         global ir
 
         ir = None
-        devices = broadlink.discover(timeout=8)
+        devices = broadlink.discover(timeout=10)
         if str(len(devices)) == 0:
             Domoticz.Error('No broadlink devices was found with Mac = {0}. Check Network/Mac address.'.format(Parameters['Mode1']))
             return False
