@@ -1,12 +1,12 @@
 #
 #           Broadlink Universal IR Remote Controller (Broadlink RM) python Plugin for Domoticz
-#           Version 0.1.0
+#           Version 0.1.1
 
 #           Powered by lib python broadlink https://github.com/mjg59/python-broadlink
 #
 
 """
-<plugin key="BroadlinkRM" name="Broadlink Universal IR Remote Controller (RM2)" author="Whilser" version="0.1.0" wikilink="https://www.domoticz.com/wiki/BroadlinkIR" externallink="https://github.com/Whilser/Broadlink-RM2-Universal-IR-Remote-Controller-Domoticz-plugin">
+<plugin key="BroadlinkRM" name="Broadlink Universal IR Remote Controller (RM2)" author="Whilser" version="0.1.1" wikilink="https://www.domoticz.com/wiki/BroadlinkIR" externallink="https://github.com/Whilser/Broadlink-RM2-Universal-IR-Remote-Controller-Domoticz-plugin">
     <description>
         <h2>Broadlink Universal IR Remote Controller</h2><br/>
         <h3>Configuration</h3>
@@ -105,7 +105,7 @@ class BasePlugin:
         if (temperature > 0) and (self.temperatureUnit == 1): Devices[2].Update(nValue=0, sValue=str(temperature))
 
         DumpConfigToLog()
-        Domoticz.Heartbeat(30)
+        Domoticz.Heartbeat(20)
 
     def onStop(self):
         Domoticz.Debug("onStop called")
@@ -151,7 +151,7 @@ class BasePlugin:
             elif Level == levels.get('Level'):
                 IR_dict = dict(levels.get('LearnedCodes'))
                 self.sendIRCommands(IR_dict)
-                Devices[Unit].Update(nValue=Level, sValue=str(Level))
+                Devices[Unit].Update(nValue=1, sValue=str(Level))
 
         self.lastLearnedIRCode = ''
         self.IRCodeCount = 0
@@ -170,7 +170,7 @@ class BasePlugin:
             self.IRCodeCount = 0
             self.IR_dict.clear()
             Domoticz.Log('levels reset')
-            Devices[self.commandUnit].Update(nValue=Level, sValue=str(Level))
+            Devices[self.commandUnit].Update(nValue=1, sValue=str(Level))
 
         # Learn Code
         if Level == 20:
@@ -179,7 +179,7 @@ class BasePlugin:
             self.IRCodeCount += 1
             self.IR_dict['IRCode'+str(self.IRCodeCount)] = self.lastLearnedIRCode
             Domoticz.Log('Code Learned')
-            Devices[self.commandUnit].Update(nValue=Level, sValue=str(Level))
+            Devices[self.commandUnit].Update(nValue=1, sValue=str(Level))
 
         # Test IR Commands
         if Level == 30:
@@ -189,7 +189,7 @@ class BasePlugin:
 
             self.sendIRCommands(self.IR_dict)
             Domoticz.Log('IR Commands sent')
-            Devices[self.commandUnit].Update(nValue=Level, sValue=str(Level))
+            Devices[self.commandUnit].Update(nValue=1, sValue=str(Level))
 
         # Save command
         if Level == 40:
@@ -210,7 +210,7 @@ class BasePlugin:
             self.lastLearnedIRCode = ''
             self.IRCodeCount = 0
             Domoticz.Log('levels saved')
-            Devices[self.commandUnit].Update(nValue=Level, sValue=str(Level))
+            Devices[self.commandUnit].Update(nValue=1, sValue=str(Level))
 
         # Create device
         if Level == 50:
@@ -225,7 +225,7 @@ class BasePlugin:
             self.levelsCount = 0
 
             Domoticz.Log('Device Created')
-            Devices[self.commandUnit].Update(nValue=Level, sValue=str(Level))
+            Devices[self.commandUnit].Update(nValue=1, sValue=str(Level))
 
     def onNotification(self, Name, Subject, Text, Status, Priority, Sound, ImageFile):
         Domoticz.Debug("Notification: " + Name + "," + Subject + "," + Text + "," + Status + "," + str(Priority) + "," + Sound + "," + ImageFile)
