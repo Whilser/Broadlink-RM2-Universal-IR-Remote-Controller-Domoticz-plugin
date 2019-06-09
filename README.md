@@ -30,7 +30,7 @@ The plugin supports sending **several IR commands at once** when switching on / 
 
 # Плагин Broadlink Universal IR Remote Controller для Domoticz
 
-## Внимание! Плагин находится в разработке, в дальнейшем возможны изменения.
+Внимание! Плагин находится в разработке, в дальнейшем возможны изменения в работе плагина.
 
 ### Поддерживаемые устройства:
 * Broadlink RM2 Pro/Plus
