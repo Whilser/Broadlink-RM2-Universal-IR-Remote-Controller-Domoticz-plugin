@@ -2,8 +2,8 @@
 Broadlink Universal IR Remote Controller plugin for Domoticz. **Note:** This plugin is under development. This plugin was tested with python 3.5.x and Domoticz 4.x installed on Raspberry Pi. 
 
 ### Currently supported:
-* Broadlink RM2 Pro/Plus
-* Broadlink RM mini3
+- [x] Broadlink RM2 Pro/Plus
+- [x] Broadlink RM mini3
 
 Plugin creates a **control center**. The control center have 5 buttons. `Reset Level` - used to reset incorrectly recognized IR code. `Learn` - used to receive (learn) IR code, `Test` - to test received IR code, `Save Level` - to save received commands into memory. There is another button - `Create`, it creates a new device in Domoticz to control your devices with an IR port.
 
@@ -33,8 +33,8 @@ The plugin supports sending **several IR commands at once** when switching on / 
 Внимание! Плагин находится в разработке, в дальнейшем возможны изменения в работе плагина.
 
 ### Поддерживаемые устройства:
-* Broadlink RM2 Pro/Plus
-* Broadlink RM mini3
+- [x] Broadlink RM2 Pro/Plus
+- [x] Broadlink RM mini3
 
 Для настройки плагина заходим в панель управления Domoticz **Настройки** -> **Оборудование** из выпадающего списка выбираем Broadlink Universal IR Remote Controller, даем ему имя, например, Broadlink, вводим mac адрес устройства. Флажок `Debug` предназначен для выявления ошибок и отладки плагина. Для того, чтобы техническая информация не сыпалась в консоль, флажок `Debug` рекомандуется установить в положение `False`. Нажимаем **Добавить**, после этого в переключателях появится командный центр управления Broadlink Universal IR Remote Controller.
 
