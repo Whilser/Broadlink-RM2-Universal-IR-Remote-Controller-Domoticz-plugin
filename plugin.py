@@ -1,12 +1,12 @@
 #
 #           Broadlink Universal IR Remote Controller (Broadlink RM) python Plugin for Domoticz
-#           Version 0.1.2
+#           Version 0.1.3
 
 #           Powered by lib python broadlink https://github.com/mjg59/python-broadlink
 #
 
 """
-<plugin key="BroadlinkRM" name="Broadlink Universal IR Remote Controller (RM2)" author="Whilser" version="0.1.2" wikilink="https://www.domoticz.com/wiki/BroadlinkIR" externallink="https://github.com/Whilser/Broadlink-RM2-Universal-IR-Remote-Controller-Domoticz-plugin">
+<plugin key="BroadlinkRM" name="Broadlink Universal IR Remote Controller (RM2)" author="Whilser" version="0.1.3" wikilink="https://www.domoticz.com/wiki/BroadlinkIR" externallink="https://github.com/Whilser/Broadlink-RM2-Universal-IR-Remote-Controller-Domoticz-plugin">
     <description>
         <h2>Broadlink Universal IR Remote Controller</h2><br/>
         <h3>Configuration</h3>
@@ -34,7 +34,6 @@ import os.path
 import json
 import base64
 import codecs
-import datetime
 
 import Domoticz
 
@@ -104,7 +103,7 @@ class BasePlugin:
         if (self.temperatureUnit == 1) and (self.commandUnit+self.temperatureUnit not in Devices):
             Domoticz.Device(Name="Temperature",  Unit=2, TypeName="Temperature", Used=1).Create()
 
-        if (temperature > 0) and (self.temperatureUnit == 1): Devices[2].Update(nValue=0, sValue=str(temperature))
+        if (temperature > 0) and (self.temperatureUnit == 1): Devices[2].Update(nValue=0, sValue=str(temperature), TimedOut = False)
 
         DumpConfigToLog()
         Domoticz.Heartbeat(20)
@@ -131,7 +130,7 @@ class BasePlugin:
         Domoticz.Debug('Handle IR Commands')
         levelsList = self.data.get('Unit {0}'.format(Unit))
 
-        if levelsList == None:
+        if levelsList is None:
             Domoticz.Error('No config file was found for Unit {0} Remove Unit {0} from selectors.'.format(Unit))
             return
 
@@ -143,17 +142,17 @@ class BasePlugin:
             if Command == 'On' and levels.get('Level') == 10:
                 IR_dict = dict(levels.get('LearnedCodes'))
                 self.sendIRCommands(IR_dict)
-                Devices[Unit].Update(nValue=1, sValue='On')
+                Devices[Unit].Update(nValue=1, sValue='On', TimedOut = False)
 
             elif Command == 'Off' and levels.get('Level') == 20:
                 IR_dict = dict(levels.get('LearnedCodes'))
                 self.sendIRCommands(IR_dict)
-                Devices[Unit].Update(nValue=0, sValue='Off')
+                Devices[Unit].Update(nValue=0, sValue='Off', TimedOut = False)
 
             elif Level == levels.get('Level'):
                 IR_dict = dict(levels.get('LearnedCodes'))
                 self.sendIRCommands(IR_dict)
-                Devices[Unit].Update(nValue=1, sValue=str(Level))
+                Devices[Unit].Update(nValue=1, sValue=str(Level), TimedOut = False)
 
         self.lastLearnedIRCode = ''
         self.IRCodeCount = 0
@@ -161,10 +160,8 @@ class BasePlugin:
 
     def HandleCommandUnitCommands(self, Level):
         if self.commandUnit not in Devices:
-            Domoticz.Error('Command device is required!')
+            Domoticz.Error('Command device is required! Restart plugin to create one.')
             return
-
-        Domoticz.Debug('Broadlink RM IP address: '+str(Parameters['Address'])+' Mac address: '+str(Parameters['Mode1']))
 
         # Reset Level
         if Level == 10:
@@ -172,7 +169,7 @@ class BasePlugin:
             self.IRCodeCount = 0
             self.IR_dict.clear()
             Domoticz.Log('levels reset')
-            Devices[self.commandUnit].Update(nValue=1, sValue=str(Level))
+            Devices[self.commandUnit].Update(nValue=1, sValue=str(Level), TimedOut = False)
 
         # Learn Code
         if Level == 20:
@@ -181,17 +178,17 @@ class BasePlugin:
             self.IRCodeCount += 1
             self.IR_dict['IRCode'+str(self.IRCodeCount)] = self.lastLearnedIRCode
             Domoticz.Log('Code Learned')
-            Devices[self.commandUnit].Update(nValue=1, sValue=str(Level))
+            Devices[self.commandUnit].Update(nValue=1, sValue=str(Level), TimedOut = False)
 
         # Test IR Commands
         if Level == 30:
             if len(self.lastLearnedIRCode) == 0:
-                Domoticz.Error('No IR command received!')
+                Domoticz.Error('No IR command received, nothing to test!')
                 return
 
             self.sendIRCommands(self.IR_dict)
             Domoticz.Log('IR Commands sent')
-            Devices[self.commandUnit].Update(nValue=1, sValue=str(Level))
+            Devices[self.commandUnit].Update(nValue=1, sValue=str(Level), TimedOut = False)
 
         # Save command
         if Level == 40:
@@ -207,12 +204,11 @@ class BasePlugin:
                 'LearnedCodes': self.IR_dict.copy()
                 })
 
-            #self.dumpConfig()
             self.IR_dict.clear()
             self.lastLearnedIRCode = ''
             self.IRCodeCount = 0
             Domoticz.Log('levels saved')
-            Devices[self.commandUnit].Update(nValue=1, sValue=str(Level))
+            Devices[self.commandUnit].Update(nValue=1, sValue=str(Level), TimedOut = False)
 
         # Create device
         if Level == 50:
@@ -227,7 +223,7 @@ class BasePlugin:
             self.levelsCount = 0
 
             Domoticz.Log('Device Created')
-            Devices[self.commandUnit].Update(nValue=1, sValue=str(Level))
+            Devices[self.commandUnit].Update(nValue=1, sValue=str(Level), TimedOut = False)
 
     def onNotification(self, Name, Subject, Text, Status, Priority, Sound, ImageFile):
         Domoticz.Debug("Notification: " + Name + "," + Subject + "," + Text + "," + Status + "," + str(Priority) + "," + Sound + "," + ImageFile)
@@ -247,13 +243,17 @@ class BasePlugin:
             self.nextTimeSync = 15
             try:
                 temperature = ir.check_temperature()
-                if ((temperature > 0) and (temperature < 100) and (self.commandUnit+self.temperatureUnit in Devices)): Devices[2].Update(nValue=0, sValue=str(temperature))
+                if ((temperature > 0) and (temperature < 100) and (self.commandUnit+self.temperatureUnit in Devices)): Devices[2].Update(nValue=0, sValue=str(temperature), TimedOut = False)
                 Domoticz.Debug('The temperature now is {} degrees.'.format(temperature))
+
             except Exception as e:
-                Domoticz.Error('{0} is not responding, check power/network connection. Error: {1}'.format(Parameters['Name'], e.__class__))
+                Domoticz.Error('Error getting temperature for {0}, check power/network connection. Error: {1}'.format(Parameters['Name'], e.__class__))
                 self.connected = False
                 self.nextTimeSync = 0
-                for x in Devices: Devices[x].Update(nValue=Devices[x].nValue, sValue=Devices[x].sValue, TimedOut = True)
+
+                for x in Devices:
+                    if Devices[x].TimedOut == False: Devices[x].Update(nValue=Devices[x].nValue, sValue=Devices[x].sValue, TimedOut = True)
+
                 return
 
     def dumpConfig(self):
@@ -284,12 +284,12 @@ class BasePlugin:
             if int(key.strip('Unit ')) not in Devices:
                 if len(levelsDict) == 1:
                     Domoticz.Device(Name=key, Unit=int(key.strip('Unit ')), Type=244, Switchtype=9, Subtype=73, Used=1).Create()
-                    #Devices[int(key.strip('Unit '))].Update(nValue=0, sValue='Off')
                     Domoticz.Debug('Device {0} was created.'.format(key))
+
                 elif len(levelsDict) == 2:
                     Domoticz.Device(Name=key, Unit=int(key.strip('Unit ')), Type=244, Switchtype=0, Subtype=73, Used=1).Create()
-                    #Devices[int(key.strip('Unit '))].Update(nValue=0, sValue='Off')
                     Domoticz.Debug('Device {0} was created.'.format(key))
+
                 else:
                     SelectorOptions =   {
                         "LevelActions"  :"|"*len(levelsDict),
@@ -317,12 +317,14 @@ class BasePlugin:
                 timeout -= 1
                 ir_packet = ir.check_data()
 
-                if ir_packet != None: learnedCode = (codecs.encode(ir_packet, 'hex_codec')).decode('utf-8')
+                if ir_packet is not None: learnedCode = (codecs.encode(ir_packet, 'hex_codec')).decode('utf-8')
 
         except Exception as e:
             Domoticz.Error('{0} is not responding, check power/network connection. Error: {1}'.format(Parameters['Name'], e.__class__))
             self.connected = False
-            for x in Devices: Devices[x].Update(nValue=Devices[x].nValue, sValue=Devices[x].sValue, TimedOut = True)
+
+            for x in Devices:
+                if Devices[x].TimedOut == False: Devices[x].Update(nValue=Devices[x].nValue, sValue=Devices[x].sValue, TimedOut = True)
 
         if (len(learnedCode)==0): Domoticz.Error('No IR command received!')
         return learnedCode
@@ -341,14 +343,16 @@ class BasePlugin:
         except Exception as e:
             Domoticz.Error('{0} is not responding, check power/network connection. Error: {1}'.format(Parameters['Name'], e.__class__))
             self.connected = False
-            for x in Devices: Devices[x].Update(nValue=Devices[x].nValue, sValue=Devices[x].sValue, TimedOut = True)
+
+            for x in Devices:
+                if Devices[x].TimedOut == False: Devices[x].Update(nValue=Devices[x].nValue, sValue=Devices[x].sValue, TimedOut = True)
 
     def discover(self):
         devices = broadlink.discover(timeout=10)
         Domoticz.Log('Found {0} Broadlink RM Universal IR Remote '.format(len(devices)))
 
         if str(len(devices)) == 0:
-            Domoticz.Log('No broadlink devices was found.')
+            Domoticz.Error('No broadlink devices was found. Check power/network and try again.')
             return False
 
         for device in devices:
@@ -369,8 +373,7 @@ class BasePlugin:
         ir = None
         devices = broadlink.discover(timeout=5)
         if str(len(devices)) == 0:
-            Domoticz.Error('No broadlink devices was found with Mac = {0}. Check Network/Mac address.'.format(Parameters['Mode1']))
-            for x in Devices: Devices[x].Update(nValue=Devices[x].nValue, sValue=Devices[x].sValue, TimedOut = True)
+            Domoticz.Error('No broadlink devices was found! Check power/network and try again.')
             return False
 
         for device in devices:
@@ -380,21 +383,24 @@ class BasePlugin:
                     ir = device
                     self.connected = True
             else:
-                Domoticz.Error('Error authenticating with device : {}'.format(device.host[0]))
-                for x in Devices: Devices[x].Update(nValue=Devices[x].nValue, sValue=Devices[x].sValue, TimedOut = True)
+                Domoticz.Log('Error authenticating with device : {}'.format(device.host[0]))
                 self.connected = False
 
-        if ir == None:
+        if ir is None:
             Domoticz.Error('No Broadlink devices was found with Mac = {0}. Check Network/Mac address.'.format(Parameters['Mode1']))
             self.connected = False
-            for x in Devices: Devices[x].Update(nValue=Devices[x].nValue, sValue=Devices[x].sValue, TimedOut = True)
+
+            for x in Devices:
+                if Devices[x].TimedOut == False: Devices[x].Update(nValue=Devices[x].nValue, sValue=Devices[x].sValue, TimedOut = True)
+
         else:
             mac = ''.join(format(x, '02x') for x in ir.mac)
             Domoticz.Log('Connected to Broadlink device type {0} with IP address = {1} and Mac address = {2}'.format(ir.type, ir.host[0], mac))
-            for x in Devices: Devices[x].Update(nValue=Devices[x].nValue, sValue=Devices[x].sValue, TimedOut = False)
+
+            for x in Devices:
+                if Devices[x].TimedOut == True: Devices[x].Update(nValue=Devices[x].nValue, sValue=Devices[x].sValue, TimedOut = False)
 
         return self.connected
-
 
 global _plugin
 _plugin = BasePlugin()
