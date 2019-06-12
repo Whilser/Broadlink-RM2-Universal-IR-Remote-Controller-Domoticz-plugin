@@ -1,17 +1,17 @@
 #
 #           Broadlink Universal IR Remote Controller (Broadlink RM) python Plugin for Domoticz
-#           Version 0.1.3
+#           Version 0.1.4
 
 #           Powered by lib python broadlink https://github.com/mjg59/python-broadlink
 #
 
 """
-<plugin key="BroadlinkRM" name="Broadlink Universal IR Remote Controller (RM2)" author="Whilser" version="0.1.3" wikilink="https://www.domoticz.com/wiki/BroadlinkIR" externallink="https://github.com/Whilser/Broadlink-RM2-Universal-IR-Remote-Controller-Domoticz-plugin">
+<plugin key="BroadlinkRM" name="Broadlink Universal IR Remote Controller (RM2)" author="Whilser" version="0.1.4" wikilink="https://www.domoticz.com/wiki/BroadlinkIR" externallink="https://github.com/Whilser/Broadlink-RM2-Universal-IR-Remote-Controller-Domoticz-plugin">
     <description>
         <h2>Broadlink Universal IR Remote Controller</h2><br/>
         <h3>Configuration</h3>
         Enter the Mac Address of your Broadlink RM2 IR device (lowercase without colon). If you do not know the Mac Address, just leave Mac Address field defaulted 0, <br/>
-        this will launch discover mode for your broadlink devices. Go to the log, it will display the found broadlink devices and the Mac Address you need.
+        this will launch discover mode for your broadlink devices. Go to the log, it will display the found broadlink devices and the Mac Address you need. <br/>
         <h3> </h3>
 
     </description>
@@ -247,9 +247,8 @@ class BasePlugin:
                 Domoticz.Debug('The temperature now is {} degrees.'.format(temperature))
 
             except Exception as e:
-                Domoticz.Error('Error getting temperature for {0}, check power/network connection. Error: {1}'.format(Parameters['Name'], e.__class__))
+                Domoticz.Log('Error getting temperature for {0}, check power/network connection. Error: {1}'.format(Parameters['Name'], e.__class__))
                 self.connected = False
-                self.nextTimeSync = 0
 
                 for x in Devices:
                     if Devices[x].TimedOut == False: Devices[x].Update(nValue=Devices[x].nValue, sValue=Devices[x].sValue, TimedOut = True)
@@ -322,9 +321,6 @@ class BasePlugin:
         except Exception as e:
             Domoticz.Error('{0} is not responding, check power/network connection. Error: {1}'.format(Parameters['Name'], e.__class__))
             self.connected = False
-
-            for x in Devices:
-                if Devices[x].TimedOut == False: Devices[x].Update(nValue=Devices[x].nValue, sValue=Devices[x].sValue, TimedOut = True)
 
         if (len(learnedCode)==0): Domoticz.Error('No IR command received!')
         return learnedCode
