@@ -235,12 +235,12 @@ class BasePlugin:
         Domoticz.Debug("onHeartbeat called")
 
         if Parameters['Mode1'] == '0': return
-        if not self.connect(): return
-
         self.nextTimeSync -= 1
 
         if self.nextTimeSync <= 0:
             self.nextTimeSync = 15
+            if not self.connect(): return
+
             try:
                 temperature = ir.check_temperature()
                 if ((temperature > 0) and (temperature < 100) and (self.commandUnit+self.temperatureUnit in Devices)): Devices[2].Update(nValue=0, sValue=str(temperature), TimedOut = False)
@@ -371,7 +371,8 @@ class BasePlugin:
         global ir
 
         ir = None
-        devices = broadlink.discover(timeout=5)
+        devices = broadlink.discover(timeout=8)
+
         if str(len(devices)) == 0:
             Domoticz.Error('No broadlink devices was found! Check power/network and try again.')
             return False
@@ -387,7 +388,7 @@ class BasePlugin:
                 self.connected = False
 
         if ir is None:
-            Domoticz.Error('No Broadlink devices was found with Mac = {0}. Check Network/Mac address.'.format(Parameters['Mode1']))
+            Domoticz.Error('No Broadlink devices was found with MAC address = {0}. Check Network/MAC Address.'.format(Parameters['Mode1']))
             self.connected = False
 
             for x in Devices:
