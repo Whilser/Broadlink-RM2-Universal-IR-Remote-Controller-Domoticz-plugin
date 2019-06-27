@@ -13,7 +13,7 @@ If before pressing `Create` only one level was saved, creates a Push On button, 
 
 The plugin supports sending **several IR commands at once** when switching on / off in Domoticz. Just press the `Learn` button several times with sending an IR command from the remote before saving the level (`Save` button).
 
-# Установка / How to Install:
+## Установка / How to Install:
 
     sudo apt-get install python3 python3-dev python3-pip
     sudo apt-get install libffi-dev libssl-dev
@@ -27,6 +27,12 @@ The plugin supports sending **several IR commands at once** when switching on / 
     pip3 install broadlink==0.10
     deactivate
 
+    sudo service domoticz restart
+
+## Обновление / How to update
+
+    cd domoticz/plugins/BroadlinkIR
+    git pull
     sudo service domoticz restart
 
 Units Example:
