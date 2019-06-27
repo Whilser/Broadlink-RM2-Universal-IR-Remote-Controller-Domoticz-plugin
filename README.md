@@ -24,7 +24,7 @@ The plugin supports sending **several IR commands at once** when switching on / 
     cd BroadlinkIR
     virtualenv -p python3 .env
     source .env/bin/activate
-    sudo pip3 install broadlink==0.10
+    pip3 install broadlink==0.10
     deactivate
 
     sudo service domoticz restart
