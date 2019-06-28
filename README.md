@@ -7,7 +7,7 @@ Broadlink Universal IR Remote Controller plugin for Domoticz. **Note:** This plu
 
 ### Domoticz configuration
 
-To configure enter the Mac Address of your Broadlink RM2 IR device (lowercase without colon). If you do not know the Mac Address, just leave Mac Address field defaulted 0, this will start discover mode for your broadlink devices. Go to the log, it will display the found broadlink devices and the Mac Address you need.
+To configure Broadlink IR just enter the Mac Address of your Broadlink RM2 IR device (lowercase without colon). If you do not know the Mac Address, just leave Mac Address field defaulted 0, this will start discover mode for your broadlink devices. Go to the log, it will display the found broadlink devices and the Mac Address you need.
 
 Plugin creates a **control center**. The control center have 5 buttons. `Reset Level` - used to reset incorrectly recognized IR code. `Learn` - used to receive (learn) IR code, `Test` - to test received IR code, `Save Level` - to save received commands into memory. There is another button - `Create`, it creates a new device in Domoticz to control your devices with an IR port.
 
