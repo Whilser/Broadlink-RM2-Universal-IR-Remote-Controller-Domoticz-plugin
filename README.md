@@ -29,7 +29,7 @@ The plugin supports sending **several IR commands at once** when switching on / 
 
     sudo service domoticz restart
 
-## Обновление / How to update
+## Обновление / How to update:
 
     cd domoticz/plugins/BroadlinkIR
     git pull
