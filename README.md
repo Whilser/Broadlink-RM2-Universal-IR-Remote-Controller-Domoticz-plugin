@@ -43,6 +43,9 @@ Units Example:
 
 ![control center](https://github.com/Whilser/Broadlink-RM2-Universal-IR-Remote-Controller-Domoticz-plugin/raw/master/images/Units.png)
 
+If you liked it, buy me coffee! <br>
+<a href="https://www.buymeacoffee.com/K8oYBpO" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/lato-orange.png" alt="If you liked it, buy me coffee!" style="height: 51px !important;width: 217px !important;" ></a>
+
 # Плагин Broadlink Universal IR Remote Controller для Domoticz
 
 Внимание! Плагин находится в разработке, в дальнейшем возможны изменения в работе плагина.
